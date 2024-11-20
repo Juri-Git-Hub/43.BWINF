@@ -1,0 +1,480 @@
+\documentclass[a4paper,10pt,ngerman]{scrartcl}
+\usepackage{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[a4paper,margin=2.5cm,footskip=0.5cm]{geometry}
+
+% Die nächsten vier Felder bitte anpassen:
+\newcommand{\Aufgabe}{Aufgabe 1: Quadratisch, Praktisch, Grün} % Aufgabennummer und Aufgabennamen angeben
+\newcommand{\TeamId}{00476}                       % Team-ID aus dem PMS angeben
+\newcommand{\TeamName}{HochgradigTalentiertwenigKrips}                 % Team-Name angeben
+\newcommand{\Namen}{Jurek Engelmann, Lennart Peters}           % Namen der Bearbeiter/-innen dieser Aufgabe angeben
+
+% Kopf- und Fußzeilen
+\usepackage{scrlayer-scrpage, lastpage}
+\setkomafont{pageheadfoot}{\large\textrm}
+\lohead{\Aufgabe}
+\rohead{Team-ID: \TeamId}
+\cfoot*{\thepage{}/\pageref{LastPage}}
+
+% Position des Titels
+\usepackage{titling}
+\setlength{\droptitle}{-1.0cm}
+
+% Für mathematische Befehle und Symbole
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Für Bilder
+\usepackage{graphicx}
+
+% Für Algorithmen
+\usepackage{algpseudocode}
+
+% Für Quelltext
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+	language=Python,
+	keywordstyle=\color{blue},
+	commentstyle=\color{mygreen},
+	stringstyle=\color{mymauve},
+	rulecolor=\color{black},
+	basicstyle=\footnotesize\ttfamily,
+	numberstyle=\tiny\color{mygray},
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	stepnumber=2,
+	tabsize=4,  % Hier wird die Einrückung angepasst
+	literate={ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+	{Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+	{ß}{{\ss}}1
+}
+\lstdefinelanguage{JavaScript}{ % JavaScript ist als einzige Sprache noch nicht vordefiniert
+	keywords={break, case, catch, continue, debugger, default, delete, do, else, finally, for, function, if, in, instanceof, new, return, switch, this, throw, try, typeof, var, void, while, with},
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]",
+	sensitive=true
+}
+
+% Diese beiden Pakete müssen zuletzt geladen werden
+%\usepackage{hyperref} % Anklickbare Links im Dokument
+\usepackage{cleveref}
+
+% Daten für die Titelseite
+\title{\textbf{\Huge\Aufgabe}}
+\author{\LARGE Team-ID: \LARGE \TeamId \\\\
+	\LARGE Team-Name: \LARGE \TeamName \\\\
+	\LARGE Bearbeiter/-innen dieser Aufgabe: \\ 
+	\LARGE \Namen\\\\}
+\date{\LARGE\today}
+
+\begin{document}
+	
+	\maketitle
+	\tableofcontents
+	
+	\vspace{0.5cm}
+	
+	\section{Lösungsansatz}
+	Der Lösungsansatz des Programms folgt einem optimierten Verfahren, das schrittweise die besten Parameter für 
+	die Aufteilung eines Grundstücks in Parzellen berechnet. Ziel ist es, das Grundstück so zu unterteilen, dass 
+	die Parzellen eine möglichst gleichmäßige Größe haben und die Anzahl der Parzellen der Anzahl der 
+	Interessenten entspricht, ohne eine maximale Obergrenze zu überschreiten. Die maximale Obergröße beträgt 10\%
+	mehr bei den Parzellen als es Interessenten gibt.
+	
+		
+	\section{Umsetzung}
+	
+	Die Umsetzung des Programms basiert auf der Anwendung mathematischer Berechnungen und Iterationen, um die optimale Aufteilung eines Grundstücks in Parzellen zu ermitteln. Die Hauptlogik des Programms wurde in mehrere Funktionen unterteilt:
+	
+	\subsection{Berechnung der optimalen Parzellenaufteilung (Funktion \texttt{calculate})}
+	
+	Die Funktion \texttt{calculate} berechnet die beste Aufteilung des Grundstücks in Parzellen und optimiert das Seitenverhältnis der Parzellen. Dabei wird die maximale Anzahl der Parzellen mit einem 10\% Puffer berechnet:
+	\[
+	\text{max\_plots} = \lceil 1.1 \times \text{people} \rceil
+	\]
+	Es folgt eine Schleife, die verschiedene Kombinationen von Reihen (\texttt{rows}) und Spalten (\texttt{columns}) testet. Für jede Kombination wird die Gesamtzahl der Parzellen (\texttt{rows} $\times$ \texttt{columns}) sowie das Seitenverhältnis (Differenz zwischen Länge und Breite der Parzellen) berechnet:
+	\[
+	\text{ratio} = \left| \frac{\text{cell\_length}}{\text{cell\_width}} - 1 \right|
+	\]
+	Die Kombination mit dem besten Seitenverhältnis wird als optimale Lösung ausgewählt.
+	
+	\begin{lstlisting}[language=Python, caption=Berechnung der optimalen Parzellenaufteilung]
+	    # Schleife über die Anzahl der Reihen (von 1 bis max_people)
+		for rows in range(1, people + 1):
+				# Berechne die Anzahl der Spalten
+				columns = math.ceil(people / rows)
+				total_plots = rows * columns  # Gesamtzahl der Parzellen
+				
+			# Überspringe ungültige Aufteilungen
+			if total_plots < people or total_plots > max_plots:
+				continue
+			
+			# Berechne die Dimensionen jeder Parzelle
+			cell_length = length / rows
+			cell_width = width / columns
+			ratio = abs(cell_length - cell_width)  # Differenz der Seitenlängen als Maß für das Verhältnis
+			
+			# Überprüfe, ob das Seitenverhältnis besser ist
+			if ratio < best_ratio:
+				best_ratio = ratio
+				best_rows = rows
+			best_columns = columns
+
+	\end{lstlisting}
+	
+	\subsection{Einlesen der Eingabedaten (Funktion \texttt{read\_file})}
+	
+	Die Eingabedaten (Anzahl der Interessenten, Länge und Breite des Grundstücks) werden entweder aus einer Datei oder über Kommandozeilenargumente eingelesen. Wird eine Datei verwendet, so liest die Funktion \texttt{read\_file} die Daten aus der Datei und gibt sie zurück:
+	\[
+	\text{people}, \text{length}, \text{width}
+	\]
+	
+	\begin{lstlisting}[language=Python, caption=Einlesen der Eingabedaten]
+		def read_file(task, verbose=False):
+			try:
+				with open(f"./Beispielaufgaben/garten{task}.txt", 'r') as file:
+					people = int(file.readline().strip())
+					length = float(file.readline().strip())
+					width = float(file.readline().strip())
+				
+			if verbose:
+				print(f"Datei {task} erfolgreich gelesen mit folgenden Werten: ")
+				print(f"Höhe: " + str(length))
+				print(f"Breite: " + str(width))
+				print(f"Personen: " + str(people))
+			
+			return people, length, width
+		except Exception as e:
+			print(f"Fehler beim Lesen der Datei {task}: {e}")
+			return None, None, None
+
+	\end{lstlisting}
+	
+	\subsection{Verarbeitung von Kommandozeilen-Argumenten (Funktion \texttt{main})}
+	
+	Die Hauptfunktion (\texttt{main}) nutzt das Modul \texttt{argparse}, um die Kommandozeilenargumente zu verarbeiten. Es können entweder eine Eingabedatei oder die Werte für Länge, Breite und Anzahl der Interessenten über die Kommandozeile angegeben werden:
+	\[
+	\texttt{parser.add\_argument("-f", "--file", help="Dateipfad zur Eingabedatei")}
+	\]
+	Je nach den Eingabedaten wird entweder die Datei verarbeitet oder die Werte aus der Kommandozeile verwendet. Druch die Kommandozeile kan man mit \texttt{all} alle Datein durchlaufen lassen, oder mit einer direkten Zahl eine bestimmte Datei verwenden. 
+	
+	\begin{lstlisting}[language=Python, caption=Verarbeitung der Kommandozeilen-Argumente]
+		if __name__ == "__main__":
+			import argparse
+			
+			parser = argparse.ArgumentParser(description="Wählen Sie eine Beispielaufgabe mit ihrer Nummer "
+			"oder wählen Sie 'all'.")
+			parser.add_argument("-i", "--input", default="all", help="Dateipfad zur Eingabedatei")
+			parser.add_argument("-v", "--verbose", action="store_true", help="Ausführliche Ausgaben anzeigen")
+			
+			args = parser.parse_args()
+			
+			if args.input not in ["all", "0", "1", "2", "3", "4", "5"]:
+				raise ValueError("Invalid Input! Please choose one of the following: 0, 1, 2, 3, 4, 5, all")
+			
+			main(args.input, args.verbose)
+
+		
+	\end{lstlisting}
+	
+	\subsection{Ausgabe der Ergebnisse}
+	
+	Am Ende gibt das Programm die optimale Aufteilung der Parzellen aus. Die Ergebnisse umfassen die Anzahl der Reihen und Spalten, die Dimensionen jeder Parzelle sowie die Gesamtzahl der Parzellen:
+	\[
+	\text{Beste Aufteilung:} \ \texttt{best\_rows} \ \text{Reihen und} \ \texttt{best\_columns} \ \text{Spalten}
+	\]
+	\[
+	\text{Jede Parzelle ist} \ \text{cell\_length} \ \text{m lang und} \ \text{cell\_width} \ \text{m breit.}
+	\]
+	
+	Die optimale Lösung wird anhand des besten Seitenverhältnisses ermittelt, wobei die Differenz zwischen der Länge und Breite jeder Parzelle minimiert wird.
+	\begin{lstlisting}[language=Python, caption=Ausgabe der Ergebnisse]
+	    print(f"Beste Aufteilung: {best_rows} Reihen und {best_columns} Spalten")
+		print(f"Jede Parzelle ist {cell_length:.2f} m lang und {cell_width:.2f} m breit.")
+		print(f"Gesamtzahl der Parzellen: {total_plots}")
+
+	\end{lstlisting}
+	
+	
+	\section{Beispielaufgaben}
+	
+	\subsection{Beispiel 1 (BWinf: Garten\_0 Datei)}
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 42 m
+		\item \texttt{width} = 66 m
+		\item \texttt{people} = 23
+	\end{itemize}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 4 Reihen und 6 Spalten
+		Jede Parzelle ist 10.50 m lang und 11.00 m breit.
+		Gesamtzahl der Parzellen: 24
+	\end{verbatim}
+	
+	\subsection{Beispiel 2 (BWinf: Garten\_1 Datei)}
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 15 m
+		\item \texttt{width} = 12 m
+		\item \texttt{people} = 19
+	\end{itemize}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 5 Reihen und 4 Spalten
+		Jede Parzelle ist 3.00 m lang und 3.00 m breit.
+		Gesamtzahl der Parzellen: 20
+	\end{verbatim}
+	
+	\subsection{Beispiel 3 (BWinf: Garten\_2 Datei)}
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 55 m
+		\item \texttt{width} = 77 m
+		\item \texttt{people} = 36
+	\end{itemize}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 5 Reihen und 8 Spalten
+		Jede Parzelle ist 11.00 m lang und 9.62 m breit.
+		Gesamtzahl der Parzellen: 40
+	\end{verbatim}
+	
+	\subsection{Beispiel 4 (BWinf: Garten\_3 Datei)}
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 15 m
+		\item \texttt{width} = 15 m
+		\item \texttt{people} = 101
+	\end{itemize}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 10 Reihen und 11 Spalten
+		Jede Parzelle ist 1.50 m lang und 1.36 m breit.
+		Gesamtzahl der Parzellen: 110
+	\end{verbatim}
+	
+	\subsection{Beispiel 5 (BWinf: Garten\_4 Datei)}
+	
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 37 m
+		\item \texttt{width} = 2000 m
+		\item \texttt{people} = 1200
+	\end{itemize}
+	
+	\textbf{Code:}
+	\begin{lstlisting}
+		length = 37
+		width = 2000
+		people = 1200
+		calculate(length, width, people)
+	\end{lstlisting}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 5 Reihen und 240 Spalten
+		Jede Parzelle ist 7.40 m lang und 8.33 m breit.
+		Gesamtzahl der Parzellen: 1200
+	\end{verbatim}
+	
+	\subsection{Beispiel 6 (BWinf: Garten\_5 Datei)}
+	
+	\textbf{Eingabe:}
+	\begin{itemize}
+		\item \texttt{length} = 365 m
+		\item \texttt{width} = 937 m
+		\item \texttt{people} = 35000
+	\end{itemize}
+	
+	\textbf{Code:}
+	\begin{lstlisting}
+		length = 365
+		width = 937
+		people = 35000
+		calculate(length, width, people)
+	\end{lstlisting}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		Beste Aufteilung: 117 Reihen und 300 Spalten
+		Jede Parzelle ist 3.12 m lang und 3.12 m breit.
+		Gesamtzahl der Parzellen: 35100
+	\end{verbatim}
+	
+	\section{Quellcode}
+	
+	In diesem Abschnitt wird der Python-Quellcode zur Berechnung der optimalen Aufteilung eines Gartens auf Basis der angegebenen Länge, Breite und Anzahl der Personen dargestellt. Der Code berechnet die beste Anzahl von Reihen und Spalten, um die Parzellen gleichmäßig zu verteilen, und prüft, ob eine gültige Aufteilung gefunden wird. Im unteren Beispiel zu sehen ist die \texttt{solve.py} welche die komplette Berechnung beinhaltet. 
+	
+	\begin{lstlisting}[caption=Berechnung der optimalen Aufteilung]
+		def calculate_solution(length, width, people, verbose=False):
+			# Berechne die maximale Anzahl von Parzellen
+			max_plots = math.ceil(1.1 * people)
+			
+			best_rows = best_columns = 0
+			best_ratio = float('inf')  # Startwert für das Seitenverhältnis
+			
+			# Schleife über die Anzahl der Reihen (von 1 bis max_people)
+			for rows in range(1, people + 1):
+				# Berechne die Anzahl der Spalten
+				columns = math.ceil(people / rows)
+				total_plots = rows * columns  # Gesamtzahl der Parzellen
+				
+				# Überspringe ungültige Aufteilungen
+				if total_plots < people or total_plots > max_plots:
+					continue
+				
+				# Berechne die Dimensionen jeder Parzelle
+				cell_length = length / rows
+				cell_width = width / columns
+				ratio = abs(cell_length - cell_width)  # Differenz der Seitenlängen als Maß für das Verhältnis
+				
+				# Überprüfe, ob das Seitenverhältnis besser ist
+				if ratio < best_ratio:
+					best_ratio = ratio
+					best_rows = rows
+					best_columns = columns
+			
+			# Überprüfen, ob eine gültige Aufteilung gefunden wurde
+			total_plots = best_rows * best_columns
+			if total_plots < people or total_plots > max_plots:
+				print("[Fehler] Keine gültige Aufteilung gefunden.")
+				return None
+			
+			# Berechne die endgültigen Dimensionen der Parzellen
+			cell_length = length / best_rows
+			cell_width = width / best_columns
+			
+			# Ausgabe der besten Aufteilung
+			print(f"Beste Aufteilung: {best_rows} Reihen und {best_columns} Spalten")
+			print(f"Jede Parzelle ist {cell_length:.2f} m lang und {cell_width:.2f} m breit.")
+			print(f"Gesamtzahl der Parzellen: {total_plots}")
+
+		
+	\end{lstlisting}
+	
+	\begin{lstlisting}[caption=Datei einlesen]
+		def read_file(task, verbose=False):
+			try:
+				with open(f"./Beispielaufgaben/garten{task}.txt", 'r') as file:
+					people = int(file.readline().strip())
+					length = float(file.readline().strip())
+					width = float(file.readline().strip())
+			
+				if verbose:
+					print(f"Datei {task} erfolgreich gelesen mit folgenden Werten: ")
+					print(f"Höhe: " + str(length))
+					print(f"Breite: " + str(width))
+					print(f"Personen: " + str(people))
+			
+				return people, length, width
+			except Exception as e:
+				print(f"Fehler beim Lesen der Datei {task}: {e}")
+				return None, None, None
+
+		
+	\end{lstlisting}
+	
+	Im folgenden Abschnitt sehen wir den Code der \texttt{main.py}. Diese Datei kümmert sich um die Übergabe der Kommandozeilenargumente und leitet die relevanten Parameter an die Berechnungsfunktionen in der \texttt{solve.py} weiter.
+
+	
+	\begin{lstlisting}[caption=Hauptfunktion zur Ausführung]
+		def main(task, verbose):
+			task = task.strip()
+			if task == "all":
+				exercises = range(0, 6)
+			else:
+				exercises = [int(task)]
+			
+			for ex in exercises:
+				people, length, width = read_file(ex, args.verbose)
+				
+				print(f"\n\nFür Beispielaufgabe {ex}:")
+				calculate_solution(length, width, people, args.verbose)
+			
+			
+		if __name__ == "__main__":
+			import argparse
+			
+			parser = argparse.ArgumentParser(description="Wählen Sie eine Beispielaufgabe mit ihrer Nummer "
+														 "oder wählen Sie 'all'.")
+			parser.add_argument("-i", "--input", default="all", help="Dateipfad zur Eingabedatei")
+			parser.add_argument("-v", "--verbose", action="store_true", help="Ausführliche Ausgaben anzeigen")
+			
+			args = parser.parse_args()
+			
+			if args.input not in ["all", "0", "1", "2", "3", "4", "5"]:
+				raise ValueError("Invalid Input! Please choose one of the following: 0, 1, 2, 3, 4, 5, all")
+			
+			main(args.input, args.verbose)
+
+	\end{lstlisting}
+	
+	
+	\subsection{Erklärung des Quellcodes}
+	
+	Der Quellcode zur Lösung der Aufgabe besteht aus mehreren Funktionen, die die 
+	Berechnung der optimalen Aufteilung der Parzellen in einem Garten ermöglichen:
+	
+	\begin{itemize}
+		\item \texttt{calculate(length, width, people)}: Diese Funktion berechnet 
+		die beste Aufteilung des Gartens. Sie nimmt die Länge \texttt{length}, 
+		die Breite \texttt{width} und die Anzahl der Personen \texttt{people} als 
+		Eingabeparameter. Die Funktion berechnet zunächst eine maximale Anzahl an 
+		Parzellen \texttt{max\_people}, die unter Berücksichtigung von 10\% 
+		Spielraum über der angegebenen Personenanzahl liegt. Anschließend wird in 
+		einer Schleife die Anzahl der Reihen (\texttt{rows}) getestet, wobei für 
+		jede Anzahl an Reihen die entsprechende Anzahl an Spalten 
+		(\texttt{columns}) berechnet wird, sodass die Gesamtzahl der Parzellen 
+		(\texttt{total\_plots}) mit der Personenanzahl \texttt{people} 
+		übereinstimmt. Das Ziel ist es, eine möglichst gleichmäßige Aufteilung zu 
+		finden, bei der die Länge und Breite der Parzellen möglichst gleich sind. 
+		Am Ende gibt die Funktion die beste Aufteilung aus und gibt die Länge und 
+		Breite der einzelnen Parzellen sowie die Gesamtzahl der Parzellen zurück.
+		
+		\item \texttt{read\_file(filename)}: Diese Funktion liest die 
+		Eingabedatei ein, die die Werte für \texttt{people}, \texttt{length} und 
+		\texttt{width} enthält. Die Datei wird geöffnet, und die Daten werden 
+		extrahiert, um sie der \texttt{calculate}-Funktion zu übergeben.
+	\end{itemize}
+	
+	Die \texttt{calculate}-Funktion stellt den Kern der Berechnungen dar, indem 
+	sie die Aufteilung des Gartens optimiert. Dabei werden verschiedene 
+	Kombinationen von Reihen und Spalten durchprobiert, um die beste Lösung zu 
+	finden. Die \texttt{read\_file}-Funktion sorgt dafür, dass die notwendigen 
+	Daten aus der Datei geladen werden.
+	
+	Durch die Verwendung von Schleifen und mathematischen Berechnungen wird eine 
+	effiziente Lösung gefunden, die eine möglichst gleichmäßige Verteilung der 
+	Parzellen gewährleistet, sodass jeder Teilnehmer ausreichend Platz erhält, 
+	ohne den verfügbaren Raum zu verschwenden. Der Code gibt schließlich die 
+	optimale Aufteilung sowie die entsprechenden Parzellengrößen aus.
+	
+	
+	\section{Was ist „so quadratisch wie möglich“?}
+	„So quadratisch wie möglich“ bedeutet, dass die Parzellen 
+	gleichmäßig auf der 
+	Fläche verteilt sind, sodass ihre Länge und Breite möglichst 
+	gleich sind. Das 
+	Verhältnis zwischen Länge und Breite sollte so nah wie möglich 
+	an 1 liegen. Denn dann ist Länge und Breite gleich. Um ein 
+	möglichst quadratisches Aussehen zu erreichen.
+	
+	
+\end{document}

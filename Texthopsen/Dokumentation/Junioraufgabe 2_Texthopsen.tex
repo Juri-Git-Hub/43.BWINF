@@ -1,0 +1,318 @@
+\documentclass[a4paper,10pt,ngerman]{scrartcl}
+\usepackage{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[a4paper,margin=2.5cm,footskip=0.5cm]{geometry}
+
+% Die nächsten vier Felder bitte anpassen:
+\newcommand{\Aufgabe}{Aufgabe 2: Texthopsen} % Aufgabennummer und Aufgabennamen angeben
+\newcommand{\TeamId}{00476}                       % Team-ID aus dem PMS angeben
+\newcommand{\TeamName}{HochgradigTalentiertWenigKrips}                 % Team-Name angeben
+\newcommand{\Namen}{Jurek Engelmann, Lennart Peters}           % Namen der Bearbeiter/-innen dieser Aufgabe angeben
+
+% Kopf- und Fußzeilen
+\usepackage{scrlayer-scrpage, lastpage}
+\setkomafont{pageheadfoot}{\large\textrm}
+\lohead{\Aufgabe}
+\rohead{Team-ID: \TeamId}
+\cfoot*{\thepage{}/\pageref{LastPage}}
+
+% Position des Titels
+\usepackage{titling}
+\setlength{\droptitle}{-1.0cm}
+
+% Für mathematische Befehle und Symbole
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Für Bilder
+\usepackage{graphicx}
+
+% Für Algorithmen
+\usepackage{algpseudocode}
+
+% Für Quelltext
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+	language=Python,
+	keywordstyle=\color{blue},
+	commentstyle=\color{mygreen},
+	stringstyle=\color{mymauve},
+	rulecolor=\color{black},
+	basicstyle=\footnotesize\ttfamily,
+	numberstyle=\tiny\color{mygray},
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	stepnumber=2,
+	tabsize=4,  % Hier wird die Einrückung angepasst
+	literate={ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+	{Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+	{ß}{{\ss}}1
+}
+\lstdefinelanguage{JavaScript}{ % JavaScript ist als einzige Sprache noch nicht vordefiniert
+	keywords={break, case, catch, continue, debugger, default, delete, do, else, finally, for, function, if, in, instanceof, new, return, switch, this, throw, try, typeof, var, void, while, with},
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]",
+	sensitive=true
+}
+
+% Diese beiden Pakete müssen zuletzt geladen werden
+%\usepackage{hyperref} % Anklickbare Links im Dokument
+\usepackage{cleveref}
+
+% Daten für die Titelseite
+\title{\textbf{\Huge\Aufgabe}}
+\author{\LARGE Team-ID: \LARGE \TeamId \\\\
+	\LARGE Team-Name: \LARGE \TeamName \\\\
+	\LARGE Bearbeiter/-innen dieser Aufgabe: \\ 
+	\LARGE \Namen\\\\}
+\date{\LARGE\today}
+
+\begin{document}
+	
+	\maketitle
+	\tableofcontents
+	
+	\vspace{0.5cm}
+	
+	\section{Lösungsidee}
+	Die Lösungsidee des Spiels besteht darin, zwei Spielerinnen (Amira und Bela) abwechselnd über einen Text springen zu lassen, wobei der Wert eines jeden Buchstabens die Sprungweite bestimmt. Das Ziel des Spiels ist es, das Ende des Textes zu erreichen, wobei der Spieler, der zuerst das Ziel erreicht, gewinnt. Die Lösung nutzt ein Dictionary zur Zuordnung von Buchstabenwerten und simuliert die Bewegung der Spielerinnen bis zu einem Ergebnis. Ein entscheidender Faktor für die Verbesserung der Laufzeitkomplexität unseres Algorithmus ist die Parallelverarbeitung der beiden Spielerinnen, Amira und Beal. Diese gleichzeitige Bearbeitung führt zu einer erheblichen Steigerung der Geschwindigkeit des gesamten Prozesses.
+	
+	\section{Umsetzung}
+	Das Programm liest den Text aus einer Datei ein, bereinigt ihn von allen Nicht-Buchstaben-Zeichen und simuliert dann das Sprungverhalten der beiden Spielerinnen. Dabei wird für jeden Buchstaben im Text die entsprechende Sprungweite anhand eines Dictionaries ermittelt. Wenn eine der Spielerinnen das Ende des Textes erreicht, wird das Ergebnis ausgegeben. Die Verwendung einer while-Schleife mit einer Abbruchbedingung sorgt dafür, dass der Algorithmus sofort stoppt, sobald eine der Spielerinnen das Ende des Textes erreicht, was die Ausführung beschleunigt und unnötige Berechnungen vermeidet.
+	
+	
+	\section{Beispielaufgaben}
+	
+	\subsection{Beispiel 1 (BWinf: hopsen1 Datei)}
+	\textbf{Eingabe:}
+	\begin{verbatim}
+		
+		Eine Schildkröte wurde wegen ihrer Langsamkeit von einem Hasen verspottet. Trotzdem wagte 
+		sie es, den Hasen zum Wettrennen herauszufordern. Der Hase ließ sich mehr aus Scherz als 
+		aus Prahlerei darauf ein. Es kam der Tag, an dem der Wettlauf stattfinden sollte. Das Ziel 
+		wurde festgelegt und beide betraten im gleichen Augenblick die Laufbahn.
+		
+		Die Schildkröte kroch langsam und unermüdlich. Der Hase dagegen legte sich mit mächtigen 
+		Sprüngen gleich ins Zeug, wollte er den Spott für die Schildkröte doch auf die Spitze 
+		treiben. Als der Hase nur noch wenige Schritte vom Ziel entfernt war, setzte er sich 
+		schnaufend ins Gras und schlief kurz darauf ein. Die großen, weiten Sprünge hatten ihn 
+		nämlich müde gemacht.
+		
+		Doch plötzlich wurde der Hase vom Jubel der Zuschauer geweckt, denn die Schildkröte hatte 
+		gerade das Ziel erreicht und gewonnen.
+		
+		Der Hase musste zugeben, dass das Vertrauen in seine Schnelligkeit ihn so leichtsinnig 
+		gemacht hatte, dass sogar ein langsames Kriechtier ihn mit Ausdauer besiegen konnte.
+	\end{verbatim}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim} 
+		
+		Verarbeite Datei: Beispielaufgaben/hopsen1.txt
+		Ergebnis für 'Beispielaufgaben/hopsen1.txt': amira
+		
+	\end{verbatim}
+	
+	\subsection{Beispiel 2 (BWinf: hopsen2	 Datei)}
+	\textbf{Eingabe:}
+	\begin{verbatim}
+		Ein Federchen flog durch das Land;
+		Ein Nilpferd schlummerte im Sand.
+		Die Feder sprach: "Ich will es wecken!"
+		Sie liebte, andere zu necken.
+		Aufs Nilpferd setzte sich die Feder
+		Und streichelte sein dickes Leder.
+		Das Nilpferd sperrte auf den Rachen
+		Und musste ungeheuer lachen.
+	\end{verbatim}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		
+		Verarbeite Datei: Beispielaufgaben/hopsen2.txt
+		Ergebnis für 'Beispielaufgaben/hopsen2.txt': tie
+		
+	\end{verbatim}
+	
+	\subsection{Beispiel 3 (BWinf: hopsen3 Datei)}
+	\textbf{Eingabe:}
+	\begin{verbatim}
+		Koukonisi ist eine kleine, nicht bewohnte griechische Insel im Golf von Moudros der Insel 
+		Limnos. Diese Insel liegt nördlich von Moudros und gehört zu dessen Gemeindebezirk. 
+		Koukonisi ist über eine befestigte Straße von der etwa 400m entfernten Küste zu erreichen.
+	\end{verbatim}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		
+		Verarbeite Datei: Beispielaufgaben/hopsen3.txt
+		Ergebnis für 'Beispielaufgaben/hopsen3.txt': tie
+		
+	\end{verbatim}
+	
+	\subsection{Beispiel 4 (BWinf: hopsen4 Datei)}
+	\textbf{Eingabe:}
+	\begin{verbatim}
+		128 Zeichen umfasst das ASCII-System und stellt damit eine simple, aber effektive 
+		Möglichkeit dar, Texte digital zu codieren. Jeder Buchstabe des lateinischen Alphabets 
+		sowie grundlegende Satzzeichen und Zahlen sind darin enthalten. Diese Beschränkung auf 128 
+		Zeichen machte ASCII besonders für frühe Computer attraktiv, da Speicherplatz sehr knapp 
+		war. Auch wenn moderne Systeme komplexere Codierungen nutzen, bleibt ASCII in vielen 
+		Bereichen relevant.
+	\end{verbatim}
+	
+	\textbf{Ausgabe:}
+	\begin{verbatim}
+		
+		Verarbeite Datei: Beispielaufgaben/hopsen4.txt
+		Ergebnis für 'Beispielaufgaben/hopsen4.txt': bela
+		
+	\end{verbatim}
+	
+	\subsection{Beispiel 5 (BWinf: hopsen5 Datei}
+	
+	Das folgende Beispiel ist zu umfangreich, um es hier in voller Länge darzustellen. Aus diesem Grund wird empfohlen, das Beispiel direkt in der Konsole auszuführen, um die vollständige Ausgabe zu erhalten.
+	
+	\begin{quote}
+		\texttt{Bitte führen Sie das Beispiel in Ihrer lokalen Entwicklungsumgebung aus, um die vollständige Ausgabe zu sehen.}
+	\end{quote}
+	
+	Falls Sie das Beispiel in einem Terminal ausführen möchten, kopieren Sie den folgenden Code und fügen ihn in Ihre Konsole ein:
+	
+	\begin{verbatim}
+		# Beispiel-Code
+		cd Texthopsen
+		python main.py -v
+	\end{verbatim}
+	
+	\section{Quellcode}
+	
+	Der folgende Python-Quellcode implementiert das "Hopsen-Spiel", bei dem zwei Spieler, Amira und Bela, auf einem Text basierend auf den Werten der Buchstaben springen. Die Spieler beginnen an verschiedenen Positionen und bewegen sich durch den Text, wobei jeder Schritt von einem Buchstabenwert abhängt. Das Ziel ist es, das Ende des Texts zu erreichen oder festzustellen, ob beide Spieler gleichzeitig das Ende erreichen (Unentschieden). Die Eingabedatei enthält den Text, und der Quellcode verarbeitet diesen Text, um das Ergebnis des Spiels zu bestimmen. In der main.py werden die Argumente mithilfe von argparse entgegengenommen und an die Hauptfunktion weitergegeben, während die eigentliche Verarbeitung und Logik des Spiels in der solve.py-Datei erfolgt.
+	
+	\begin{lstlisting}[language=Python]
+		import os
+		from solve import read_input, get_winner
+		
+		
+		# Hauptfunktion
+		def main(file_path, verbose):
+			# alle Werte Buchstaben in einem Dictionary speichern
+			buchstaben_werte = {chr(i + 96): i for i in range(1, 27)}
+			buchstaben_werte["ä"] = 27
+			buchstaben_werte["ö"] = 28
+			buchstaben_werte["ü"] = 29
+			buchstaben_werte["ß"] = 30
+			
+			if verbose:
+				print(f"\nVerarbeite Datei: {file_path}")
+			
+			# text einlesen
+			text = read_input(file_path)
+			# alle Zeichen, die keine Buchstaben sind nicht abspeichern und alle Buchstaben zu kleinen Buchstaben umwandeln
+			text_clean = [buchstabe.lower() for buchstabe in text if buchstabe.isalpha()]
+			
+			result = get_winner(text_clean, buchstaben_werte, 0, 1)
+			print(f"Ergebnis für '{file_path}': {result}")
+			
+		
+		# argparse für die Argumente verwenden
+		if __name__ == "__main__":
+			import argparse
+			
+			parser = argparse.ArgumentParser(description="Hopsen-Spiel zwischen Amira und Bela.")
+			parser.add_argument(
+			"file_path",
+			nargs="?",
+			type=str,
+			help="Pfad zur Eingabedatei (optional). "
+				 "Wenn nicht angegeben, werden die Dateien hopsen1.txt bis hopsen5.txt durchlaufen.",
+			)
+			parser.add_argument(
+				"-v", "--verbose",
+				action="store_true",
+				help="Ausführliche Ausgabe aktivieren"
+			)
+			args = parser.parse_args()
+			
+			if args.file_path:
+				if os.path.exists(args.file_path):
+					main(args.file_path, args.verbose)
+				else:
+					print(f"Datei {args.file_path} nicht gefunden.")
+			else:
+				# Dateien von hopsen1.txt bis hopsen5.txt durchgehen
+				for i in range(1, 6):
+					filename = f"Beispielaufgaben/hopsen{i}.txt"
+					print(f"{i}. Beispielaufgabe")
+					if os.path.exists(filename):
+						main(filename, args.verbose)
+					else:
+						if args.verbose:
+							print(f"Datei {filename} nicht gefunden.")
+
+	\end{lstlisting}
+	
+	Die richtige Lösung für das Spiel wird in der solve.py-Datei implementiert, während in der main.py die Argumente über argparse entgegengenommen und an die Hauptfunktion weitergegeben werden.
+	
+	
+	\begin{lstlisting}
+		# Funktion zum Einlesen der Eingabedatei
+		def read_input(file_path):
+			with open(file_path) as file:
+				input_text = file.read()
+			return input_text
+			
+		
+		# Funktion, die das Hopsen-Spiel implementiert
+		def get_winner(text, buchstaben_werte, amira, bela):
+			pos_amira = amira
+			pos_bela = bela
+			len_text = len(text)
+			
+			# solange iterieren bis es ein Ergebnis gibt
+			while True:
+				# aktueller buchstabe von Amira und Bela
+				a_buchstabe = text[pos_amira]
+				b_buchstabe = text[pos_bela]
+				
+				# Positionen von Amira und Bela aktualisieren
+				pos_amira += buchstaben_werte[a_buchstabe]
+				pos_bela += buchstaben_werte[b_buchstabe]
+				
+				# überprüfen, ob es ein Ergebnis gibt
+				if pos_amira >= len_text and pos_bela >= len_text:
+					return "Unentschieden"
+				elif pos_amira >= len_text:
+					return "Amira"
+				elif pos_bela >= len_text:
+					return "Bela"
+		
+	\end{lstlisting}
+	
+	\subsection{Erklärung des Quellcodes}
+	
+	Der Quellcode besteht aus mehreren Teilen, die jeweils unterschiedliche Funktionen im "Hopsen-Spiel" übernehmen:
+	
+	\begin{itemize}
+		\item \texttt{read\_input(file\_path)}: Diese Funktion liest die Eingabedatei und gibt ihren Inhalt als Text zurück.
+		\item \texttt{hopsen(text, buchstaben\_werte, amira, bela)}: Hier findet die eigentliche Logik des Spiels statt. Es wird überprüft, wie Amira und Bela sich basierend auf den Werten der Buchstaben bewegen. Die Spieler beginnen an den Positionen \texttt{amira} und \texttt{bela} und springen weiter, bis einer der Spieler das Ende des Textes erreicht. Falls beide das Ende gleichzeitig erreichen, gibt es ein Unentschieden.
+		\item \texttt{game(file\_path, verbose)}: Diese Funktion ist für das gesamte Spiel verantwortlich. Sie lädt den Text aus der Datei, bereinigt ihn (entfernt alle Nicht-Buchstabenzeichen), und ruft dann die \texttt{hopsen}-Funktion auf. Falls die Option \texttt{-v} für ausführliche Ausgabe aktiviert ist, wird der Name der Eingabedatei angezeigt.
+		\item \texttt{argparse}: Mit dieser Bibliothek werden die Kommandozeilenargumente verarbeitet. Es wird ein optionaler Dateipfad \texttt{file\_path} erwartet, andernfalls werden automatisch Dateien von \texttt{hopsen1.txt} bis \texttt{hopsen5.txt} durchlaufen. Die Option \texttt{-v} aktiviert die ausführliche Ausgabe.
+	\end{itemize}
+	
+	Der Code ermöglicht es, das "Hopsen-Spiel" sowohl mit einer spezifischen Eingabedatei als auch mit einer Reihe von Beispiel-Dateien auszuführen. Wenn keine Datei angegeben wird, werden standardmäßig fünf Beispiel-Dateien verarbeitet. Der Parameter \texttt{-v} sorgt für eine detaillierte Ausgabe über die Verarbeitung der Datei und das Ergebnis des Spiels.
+	
+	
+\end{document}
